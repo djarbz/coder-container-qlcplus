@@ -30,14 +30,14 @@ jobs:
             exit 1
           fi
           version=$(echo "${{ github.ref_name }}" | sed -E 's/^v([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
-          echo "tag=${version}" >> $GITHUB_OUTPUT
+          echo "tag=${version}" | tee $GITHUB_OUTPUT
 
       - name: Download QLC Release
         run: curl -fsSL https://www.qlcplus.org/downloads/${{ steps.get_qlc_version.outputs.tag }}/qlcplus_${{ steps.get_qlc_version.outputs.tag }}_amd64.deb --output qlcplus.deb
       
       - name: Get daily build suffix
         id: get_build_suffix
-        run: echo "tag=$(date '+%y%m%d')" >> $GITHUB_OUTPUT
+        run: echo "tag=$(date '+%y%m%d')" | tee $GITHUB_OUTPUT
             
       # - name: Log in to Docker Hub
       #   uses: docker/login-action@v3
@@ -58,7 +58,7 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=semver,pattern={{version}}-${{ steps.get_build_suffix.outputs.tag }}
+            type=semver,pattern={{version}},suffix=${{ steps.get_build_suffix.outputs.tag }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}.{{patch}}
             type=semver,pattern={{major}}.{{minor}}
