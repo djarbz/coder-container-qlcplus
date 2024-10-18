@@ -29,12 +29,6 @@ jobs:
           echo "build=b$(echo "${{ github.ref_name }}" | sed -n -E 's/.*-b\+([0-9]{6}\.[0-9]+).*/\1/p')" | tee -a $GITHUB_OUTPUT
           echo "datecode=$(date '+%y%m%d')" | tee -a $GITHUB_OUTPUT
 
-      - name: Parse semver string
-        id: semver 
-        uses: booxmedialtd/ws-action-parse-semver@v1.4.7
-        with:
-          input_string: "${{ github.ref_name }}"
-
       - name: Check out the repo
         uses: actions/checkout@v4
         with:
