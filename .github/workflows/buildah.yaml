@@ -15,11 +15,6 @@ jobs:
       contents: read
     if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v') && contains(github.ref, '.')
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - name: Check if tag matches pattern
         id: tag_pattern
         run: |
@@ -33,6 +28,11 @@ jobs:
           echo "tag=${version}" | tee -a $GITHUB_OUTPUT
           echo "build=$(echo "${version}" | sed -n -E 's/.*-b([0-9]+).*/b\1/p')" | tee -a $GITHUB_OUTPUT
           echo "datecode=$(date '+%y%m%d')" | tee -a $GITHUB_OUTPUT
+
+      - name: Check out the repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Download QLC Release
         run: curl -fsSL https://www.qlcplus.org/downloads/${{ steps.tag_pattern.outputs.tag }}/qlcplus_${{ steps.tag_pattern.outputs.tag }}_amd64.deb --output qlcplus.deb
