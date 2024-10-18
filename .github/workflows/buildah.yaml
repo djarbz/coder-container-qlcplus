@@ -37,11 +37,15 @@ jobs:
       - name: Download QLC Release
         run: curl -fsSL https://www.qlcplus.org/downloads/${{ steps.tag_pattern.outputs.tag }}/qlcplus_${{ steps.tag_pattern.outputs.tag }}_amd64.deb --output qlcplus.deb
        
-      # - name: Log in to Docker Hub
-      #   uses: docker/login-action@v3
-      #   with:
-      #     username: #{{ secrets.DOCKER_USERNAME }}
-      #     password: #{{ secrets.DOCKER_PASSWORD }}
+      - name: Log in to Docker Hub
+        if: ${{ env.USERNAME }} != '' ${{ env.PASSWORD }} != ''
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.USERNAME }}
+          password: ${{ env.PASSWORD }}
+        env:
+          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          PASSWORD: ${{ secrets.DOCKER_PASSWORD }} 
 
       - name: Log in to Github Container registry
         uses: docker/login-action@v3
