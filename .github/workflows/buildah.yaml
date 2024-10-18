@@ -31,7 +31,7 @@ jobs:
           fi
           version=$(echo "${{ github.ref_name }}" | sed -E 's/^v([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
           echo "tag=${version}" | tee -a $GITHUB_OUTPUT
-          echo "build=$(echo "${version}" | sed -E 's/.*-b([0-9]+).*/b\1/')" | tee -a $GITHUB_OUTPUT
+          echo "build=$(echo "${version}" | sed -E 's/.*-b([0-9]+).*/b\1/;t;d')" | tee -a $GITHUB_OUTPUT
           echo "datecode=$(date '+%y%m%d')" | tee -a $GITHUB_OUTPUT
 
       - name: Download QLC Release
