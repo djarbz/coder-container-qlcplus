@@ -30,16 +30,13 @@ jobs:
             exit 1
           fi
           version=$(echo "${{ github.ref_name }}" | sed -E 's/^v([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
-          echo "tag=${version}" | tee $GITHUB_OUTPUT
-          echo "build=$(echo "${version}" | sed -E 's/.*-b([0-9]+).*/b\1/')" | tee $GITHUB_OUTPUT
+          echo "tag=${version}" | tee -a $GITHUB_OUTPUT
+          echo "build=$(echo "${version}" | sed -E 's/.*-b([0-9]+).*/b\1/')" | tee -a $GITHUB_OUTPUT
+          echo "datecode=$(date '+%y%m%d')" | tee -a $GITHUB_OUTPUT
 
       - name: Download QLC Release
         run: curl -fsSL https://www.qlcplus.org/downloads/${{ steps.tag_pattern.outputs.tag }}/qlcplus_${{ steps.tag_pattern.outputs.tag }}_amd64.deb --output qlcplus.deb
-      
-      - name: Get daily build suffix
-        id: get_build_suffix
-        run: echo "tag=$(date '+%y%m%d')" | tee $GITHUB_OUTPUT
-            
+       
       # - name: Log in to Docker Hub
       #   uses: docker/login-action@v3
       #   with:
@@ -59,7 +56,7 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=semver,pattern={{version}},suffix=-${{ steps.tag_pattern.outputs.build }}.${{ steps.get_build_suffix.outputs.tag }}
+            type=semver,pattern={{version}},suffix=-${{ steps.tag_pattern.outputs.build }}.${{ steps.tag_pattern.outputs.datecode }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}.{{patch}},value=${{ steps.tag_pattern.outputs.tag }}
             type=semver,pattern={{major}}.{{minor}},value=${{ steps.tag_pattern.outputs.tag }}
