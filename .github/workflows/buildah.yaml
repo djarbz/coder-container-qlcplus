@@ -21,6 +21,7 @@ jobs:
           fetch-depth: 0
 
       - name: Check if tag matches pattern
+        id: get_qlc_version
         run: |
           if [[ "${{ github.ref_name }}" =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Tag [${{ github.ref_name }}] matches the vX.X.X.X pattern."
@@ -28,11 +29,13 @@ jobs:
             echo "Tag [${{ github.ref_name }}] does NOT match the vX.X.X.X pattern. Exiting."
             exit 1
           fi
+          version=$(echo "${{ github.ref_name }}" | sed -E 's/^v([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+          echo "tag=${version}" >> $GITHUB_OUTPUT
 
       - name: Download QLC Release
         uses: Minionguyjpro/Download-File-Action@v1
         with:
-          url: https://www.qlcplus.org/downloads/$VERSION/qlcplus_$VERSION_amd64.deb
+          url: https://www.qlcplus.org/downloads/${{ steps.get_qlc_version.outputs.tag }}/qlcplus_${{ steps.get_qlc_version.outputs.tag }}_amd64.deb
           path: qlcplus.deb
       
       - name: Get daily build suffix
@@ -58,7 +61,7 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=semver,pattern={{version}}-${{ steps.get_latest_tag.outputs.LATEST_TAG }}
+            type=semver,pattern={{version}}-${{ steps.get_build_suffix.outputs.tag }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}.{{patch}}
             type=semver,pattern={{major}}.{{minor}}
