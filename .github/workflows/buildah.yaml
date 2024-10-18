@@ -78,4 +78,11 @@ jobs:
       #       ./Containerfile
       #     build-args: |
       #       some_arg=some_value
+
+      - name: Delete tag [${{ github.ref_name }}] on failure
+        if: failure()
+        run: |
+          echo "Deleting tag: ${{ github.ref_name }}"
+          git tag -d "${{ github.ref_name }}"
+          git push origin ":${{ github.ref_name }}"
     
