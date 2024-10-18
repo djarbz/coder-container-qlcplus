@@ -33,10 +33,7 @@ jobs:
           echo "tag=${version}" >> $GITHUB_OUTPUT
 
       - name: Download QLC Release
-        uses: Minionguyjpro/Download-File-Action@v1
-        with:
-          url: https://www.qlcplus.org/downloads/${{ steps.get_qlc_version.outputs.tag }}/qlcplus_${{ steps.get_qlc_version.outputs.tag }}_amd64.deb
-          path: qlcplus.deb
+        run: curl -fsSL https://www.qlcplus.org/downloads/${{ steps.get_qlc_version.outputs.tag }}/qlcplus_${{ steps.get_qlc_version.outputs.tag }}_amd64.deb qlcplus.deb
       
       - name: Get daily build suffix
         id: get_build_suffix
@@ -65,7 +62,7 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}.{{patch}}
             type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern,enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }}={{major}}
+            type=semver,pattern={{major}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }}
             type=semver,pattern={{major}}-latest
 
       - name: Debug Container Meta outputs
