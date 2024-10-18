@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 0
 
       - name: Check if tag matches pattern
-        id: get_qlc_version
+        id: tag_pattern
         run: |
           if [[ "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-b[0-9]+$ ]]; then
             echo "Tag [${{ github.ref_name }}] matches the vX.X.X-bX pattern."
@@ -31,9 +31,10 @@ jobs:
           fi
           version=$(echo "${{ github.ref_name }}" | sed -E 's/^v([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
           echo "tag=${version}" | tee $GITHUB_OUTPUT
+          echo "build=$(echo "${version}" | sed -E 's/.*-b([0-9]+).*/b\1/')" | tee $GITHUB_OUTPUT
 
       - name: Download QLC Release
-        run: curl -fsSL https://www.qlcplus.org/downloads/${{ steps.get_qlc_version.outputs.tag }}/qlcplus_${{ steps.get_qlc_version.outputs.tag }}_amd64.deb --output qlcplus.deb
+        run: curl -fsSL https://www.qlcplus.org/downloads/${{ steps.tag_pattern.outputs.tag }}/qlcplus_${{ steps.tag_pattern.outputs.tag }}_amd64.deb --output qlcplus.deb
       
       - name: Get daily build suffix
         id: get_build_suffix
@@ -58,12 +59,12 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=semver,pattern={{version}},suffix=${{ steps.get_build_suffix.outputs.tag }}
+            type=semver,pattern={{version}},suffix=-${{ steps.tag_pattern.outputs.build }}.${{ steps.get_build_suffix.outputs.tag }}
             type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}.{{patch}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }}
-            type=semver,pattern={{major}}-latest
+            type=semver,pattern={{major}}.{{minor}}.{{patch}},value=${{ steps.tag_pattern.outputs.tag }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ steps.tag_pattern.outputs.tag }}
+            type=semver,pattern={{major}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }},value=${{ steps.tag_pattern.outputs.tag }}
+            type=semver,pattern={{major}}-latest,value=${{ steps.tag_pattern.outputs.tag }}
 
       - name: Debug Container Meta outputs
         run:   echo "$OUTPUTS"
