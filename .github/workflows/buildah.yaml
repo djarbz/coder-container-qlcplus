@@ -33,7 +33,7 @@ jobs:
           echo "tag=${version}" >> $GITHUB_OUTPUT
 
       - name: Download QLC Release
-        run: curl -fsSL https://www.qlcplus.org/downloads/${{ steps.get_qlc_version.outputs.tag }}/qlcplus_${{ steps.get_qlc_version.outputs.tag }}_amd64.deb qlcplus.deb
+        run: curl -fsSL https://www.qlcplus.org/downloads/${{ steps.get_qlc_version.outputs.tag }}/qlcplus_${{ steps.get_qlc_version.outputs.tag }}_amd64.deb --output qlcplus.deb
       
       - name: Get daily build suffix
         id: get_build_suffix
