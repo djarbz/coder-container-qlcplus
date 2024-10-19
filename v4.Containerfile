@@ -39,8 +39,7 @@ Terminal=false\n\
 StartupNotify=false" > /usr/share/applications/Q\ Light\ Controller\ Plus.desktop
 
 # Set appropriate permissions for the desktop files
-RUN chmod +x /usr/share/applications/qlcplus-fixtureeditor.desktop && \
-    chmod +x /usr/share/applications/qlcplus.desktop
+RUN chmod +x /usr/share/applications/*.desktop
 
 # Update package cache
 RUN apt-get update
