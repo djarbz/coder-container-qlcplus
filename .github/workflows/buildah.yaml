@@ -28,6 +28,27 @@ jobs:
           echo "tag=$(echo "${{ github.ref_name }}" | sed -E 's/^v([0-9]+\.[0-9]+\.[0-9]+).*/\1/')" | tee -a $GITHUB_OUTPUT
           echo "build=b$(echo "${{ github.ref_name }}" | sed -n -E 's/.*-b\+([0-9]{6}\.[0-9]+).*/\1/p')" | tee -a $GITHUB_OUTPUT
           echo "datecode=$(date '+%y%m%d')" | tee -a $GITHUB_OUTPUT
+      
+      - name: Split Tag semver parts
+        id: semver
+        run: |
+          # Extract major, minor, patch, build
+          if [[ "${{ github.ref_name }}" =~ v([0-9]+)\.([0-9]+)\.([0-9]+)-b\+([0-9]+)\.([0-9]+) ]]; then
+              major="${BASH_REMATCH[1]}"
+              minor="${BASH_REMATCH[2]}"
+              patch="${BASH_REMATCH[3]}"
+              datecode="${BASH_REMATCH[4]}"
+              build="${BASH_REMATCH[5]}"
+              
+              echo "major=$major" | tee -a $GITHUB_OUTPUT
+              echo "minor=$minor" | tee -a $GITHUB_OUTPUT
+              echo "patch=$patch" | tee -a $GITHUB_OUTPUT
+              echo "datecode=$datecode" | tee -a $GITHUB_OUTPUT
+              echo "build=$build" | tee -a $GITHUB_OUTPUT
+          else
+              echo "Version format [${{ github.ref_name }}] not recognized."
+              exit 1
+          fi
 
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -78,7 +99,7 @@ jobs:
           image: ghcr.io/${{ github.repository }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          containerfiles: ./Containerfile
+          containerfiles: ./${{ steps.semver.outputs.major }}.Containerfile
           build-args: |
             VERSION=${{ steps.tag_pattern.outputs.tag }}
             BUILD=${{ steps.tag_pattern.outputs.build }}
