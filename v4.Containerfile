@@ -11,6 +11,8 @@ ENV REPO_VERSION=$REPO_VERSION
 # Only set as arg so that it is only set during the build process
 ARG DEBIAN_FRONTEND=noninteractive
 
+RUN mkdir $HOME/Desktop
+
 USER root
 
 # Create desktop icons
