@@ -76,7 +76,6 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
           flavor: latest=false
           tags: |
             type=semver,pattern={{version}},value=${{ steps.semver.outputs.version }},suffix=-b${{ steps.semver.outputs.datecode }}.${{ steps.semver.outputs.build }}
@@ -96,7 +95,7 @@ jobs:
         id: buildah
         uses: redhat-actions/buildah-build@v2
         with:
-          image: ghcr.io/${{ github.repository }}
+          image: ${{ github.repository }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           containerfiles: ./v${{ steps.semver.outputs.major }}.Containerfile
@@ -111,7 +110,7 @@ jobs:
         id: push-to-ghcr
         uses: redhat-actions/push-to-registry@v2
         with:
-          image: ${{ steps.buildah.outputs.image }}
+          image: ghcr.io/${{ steps.buildah.outputs.image }}
           tags: ${{ steps.buildah.outputs.tags }}
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -127,7 +126,7 @@ jobs:
         id: push-to-hub
         uses: redhat-actions/push-to-registry@v2
         with:
-          image: ${{ steps.buildah.outputs.image }}
+          image: docker.io/${{ steps.buildah.outputs.image }}
           tags: ${{ steps.buildah.outputs.tags }}
           registry: docker.io
           username: ${{ env.USERNAME }}
