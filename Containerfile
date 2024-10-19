@@ -9,22 +9,21 @@ USER root
 
 # Install Dependancies
 RUN apt-get update
-RUN apt-get install -y --no-install-recommends \
-    desktop-file-utils \
-    shared-mime-info \
-    libasound2t64 \
-    libfftw3-double3 \
-    libftdi1-2 \
-    libqt5core5t64 \
-    libqt5gui5 \
-    libqt5gui5-gles \
-    libqt5multimedia5 \
-    libqt5multimediawidgets5 \
-    libqt5network5t64 \
-    libqt5script5 \
-    libqt5serialport5 \
-    libqt5widgets5t64 \
-    libusb-1.0-0
+RUN apt-get install -y --no-install-recommends desktop-file-utils
+RUN apt-get install -y --no-install-recommends shared-mime-info
+RUN apt-get install -y --no-install-recommends libasound2t64
+RUN apt-get install -y --no-install-recommends libfftw3-double3
+RUN apt-get install -y --no-install-recommends libftdi1-2
+RUN apt-get install -y --no-install-recommends libqt5core5t64
+RUN apt-get install -y --no-install-recommends libqt5gui5
+RUN apt-get install -y --no-install-recommends libqt5gui5-gles
+RUN apt-get install -y --no-install-recommends libqt5multimedia5
+RUN apt-get install -y --no-install-recommends libqt5multimediawidgets5
+RUN apt-get install -y --no-install-recommends libqt5network5t64
+RUN apt-get install -y --no-install-recommends libqt5script5
+RUN apt-get install -y --no-install-recommends libqt5serialport5
+RUN apt-get install -y --no-install-recommends libqt5widgets5t64
+RUN apt-get install -y --no-install-recommends libusb-1.0-0
 RUN rm -rf /var/lib/apt/lists/*
 
 # Install QLC Plus
