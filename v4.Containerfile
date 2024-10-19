@@ -10,6 +10,10 @@ ENV REPO_VERSION=$REPO_VERSION
 
 USER root
 
+# Update package cache
+RUN apt-get update
+
+RUN apt-get -qq install -y --no-install-recommends gnupg
 RUN echo "deb http://download.opensuse.org/repositories/home:/mcallegari79/xUbuntu_${REPO_VERSION}/ /" | tee /etc/apt/sources.list.d/home:mcallegari79.list
 RUN curl -fsSL https://download.opensuse.org/repositories/home:mcallegari79/xUbuntu_${REPO_VERSION}/Release.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/home_mcallegari79.gpg > /dev/null
 
@@ -54,6 +58,8 @@ RUN apt-get -qq install -y --no-install-recommends apt-utils
 
 # Cleanup
 RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get remove -y --purge gnupg
+RUN apt-get autoremove -y
 
 # Install QLC Plus
 # COPY qlcplus.deb /tmp/qlcplus.deb

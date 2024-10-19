@@ -103,6 +103,7 @@ jobs:
           build-args: |
             VERSION=${{ steps.tag_pattern.outputs.tag }}
             BUILD=${{ steps.tag_pattern.outputs.build }}
+            REPO_VERSION=23.04
 
       - name: Delete tag [${{ github.ref_name }}] on failure
         if: failure()
