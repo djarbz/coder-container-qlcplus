@@ -40,8 +40,9 @@ RUN apt-get -qq install -y --no-install-recommends apt-utils
 RUN apt-get -qq install -y --no-install-recommends qlcplus-qt5
 
 # Cleanup
-RUN rm -rf /var/lib/apt/lists/*
 RUN apt-get remove -y --purge gnupg
 RUN apt-get autoremove -y
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
 
 USER coder
