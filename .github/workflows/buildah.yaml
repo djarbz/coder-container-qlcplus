@@ -95,7 +95,8 @@ jobs:
         id: buildah
         uses: redhat-actions/buildah-build@v2
         with:
-          image: ${{ github.repository }}
+          # image: ${{ github.repository }}
+          image: ${{ github.repository_owner }}/qlcplus
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           containerfiles: ./v${{ steps.semver.outputs.major }}.Containerfile
