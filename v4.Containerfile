@@ -24,7 +24,7 @@ Exec=qlcplus-fixtureeditor --open %f\n\
 Icon=qlcplus-fixtureeditor\n\
 Path=\n\
 Terminal=false\n\
-StartupNotify=false" > /usr/share/applications/QLC+\ Fixture\ Editor.desktop
+StartupNotify=false" > /home/coder/Desktop/QLC+\ Fixture\ Editor.desktop
 
 # Create the Q Light Controller Plus desktop entry
 RUN echo "[Desktop Entry]\n\
@@ -36,10 +36,10 @@ Exec=qlcplus --debug --fullscreen --log --web --open %f\n\
 Icon=qlcplus\n\
 Path=\n\
 Terminal=false\n\
-StartupNotify=false" > /usr/share/applications/Q\ Light\ Controller\ Plus.desktop
+StartupNotify=false" > /home/coder/Desktop/Q\ Light\ Controller\ Plus.desktop
 
 # Set appropriate permissions for the desktop files
-RUN chmod +x /usr/share/applications/*.desktop
+RUN chmod +x /home/coder/Desktop/*.desktop
 
 # Update package cache
 RUN apt-get update
