@@ -16,7 +16,7 @@ USER root
 # Update package cache
 RUN apt-get update
 
-RUN apt-get -qq install -o Dpkg::Progress-Fancy="0" -y --no-install-recommends gnupg
+RUN apt-get install -o Dpkg::Progress-Fancy="0" -yqq --no-install-recommends gnupg
 RUN echo "deb http://download.opensuse.org/repositories/home:/mcallegari79/xUbuntu_${REPO_VERSION}/ /" | tee /etc/apt/sources.list.d/home:mcallegari79.list
 RUN curl -fsSL https://download.opensuse.org/repositories/home:mcallegari79/xUbuntu_${REPO_VERSION}/Release.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/home_mcallegari79.gpg > /dev/null
 
@@ -24,7 +24,7 @@ RUN curl -fsSL https://download.opensuse.org/repositories/home:mcallegari79/xUbu
 RUN apt-get update
 
 # Install and configure locales
-RUN apt-get -qq install -o Dpkg::Progress-Fancy="0" -y --no-install-recommends locales
+RUN apt-get install -o Dpkg::Progress-Fancy="0" -yqq --no-install-recommends locales
 RUN locale-gen en_US.UTF-8
 RUN update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 
@@ -34,10 +34,10 @@ ENV LANGUAGE=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 
 # Resolve error [debconf: delaying package configuration, since apt-utils is not installed]
-RUN apt-get -qq install -o Dpkg::Progress-Fancy="0" -y --no-install-recommends apt-utils
+RUN apt-get install -o Dpkg::Progress-Fancy="0" -yqq --no-install-recommends apt-utils
 
 # Install QLCPlus
-RUN apt-get -qq install -o Dpkg::Progress-Fancy="0" -y --no-install-recommends qlcplus-qt5
+RUN apt-get install -o Dpkg::Progress-Fancy="0" -yqq --no-install-recommends qlcplus-qt5
 
 # Cleanup
 RUN apt-get remove -y --purge gnupg
