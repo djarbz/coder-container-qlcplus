@@ -8,6 +8,11 @@ ENV BUILD=$BUILD
 ARG REPO_VERSION="23.04"
 ENV REPO_VERSION=$REPO_VERSION
 
+# Only set as arg so that it is only set during the build process
+ARG DEBIAN_FRONTEND=noninteractive
+
+USER root
+
 # Create desktop icons
 # Create the QLC+ Fixture Editor desktop entry
 RUN echo "[Desktop Entry]\n\
@@ -33,10 +38,9 @@ Path=\n\
 Terminal=false\n\
 StartupNotify=false" > /usr/share/applications/Q\ Light\ Controller\ Plus.desktop
 
-# Only set as arg so that it is only set during the build process
-ARG DEBIAN_FRONTEND=noninteractive
-
-USER root
+# Set appropriate permissions for the desktop files
+RUN chmod +x /usr/share/applications/qlcplus-fixtureeditor.desktop && \
+    chmod +x /usr/share/applications/qlcplus.desktop
 
 # Update package cache
 RUN apt-get update
