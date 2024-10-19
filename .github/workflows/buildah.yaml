@@ -17,7 +17,6 @@ jobs:
     if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v') && contains(github.ref, '.')
     steps:
       - name: Check if tag matches pattern
-        id: tag_pattern
         run: |
           if [[ "${{ github.ref_name }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-b\+[0-9]{6}\.[0-9]+$ ]]; then
             echo "Tag [${{ github.ref_name }}] matches the v#.#.#-b+YYMMDD.# pattern."
@@ -25,9 +24,6 @@ jobs:
             echo "Tag [${{ github.ref_name }}] does NOT match the v#.#.#-b+YYMMDD.# pattern. Exiting."
             exit 1
           fi
-          echo "tag=$(echo "${{ github.ref_name }}" | sed -E 's/^v([0-9]+\.[0-9]+\.[0-9]+).*/\1/')" | tee -a $GITHUB_OUTPUT
-          echo "build=b$(echo "${{ github.ref_name }}" | sed -n -E 's/.*-b\+([0-9]{6}\.[0-9]+).*/\1/p')" | tee -a $GITHUB_OUTPUT
-          echo "datecode=$(date '+%y%m%d')" | tee -a $GITHUB_OUTPUT
       
       - name: Split Tag semver parts
         id: semver
@@ -40,6 +36,7 @@ jobs:
               datecode="${BASH_REMATCH[4]}"
               build="${BASH_REMATCH[5]}"
               
+              echo "version=$major.$minor.$patch" | tee -a $GITHUB_OUTPUT
               echo "major=$major" | tee -a $GITHUB_OUTPUT
               echo "minor=$minor" | tee -a $GITHUB_OUTPUT
               echo "patch=$patch" | tee -a $GITHUB_OUTPUT
@@ -56,7 +53,7 @@ jobs:
           fetch-depth: 0
 
       - name: Download QLC Release
-        run: curl -fsSL https://www.qlcplus.org/downloads/${{ steps.tag_pattern.outputs.tag }}/qlcplus_${{ steps.tag_pattern.outputs.tag }}_amd64.deb --output qlcplus.deb
+        run: curl -fsSL https://www.qlcplus.org/downloads/${{ steps.semver.outputs.version }}/qlcplus_${{ steps.semver.outputs.version }}_amd64.deb --output qlcplus.deb
        
       - name: Log in to Docker Hub
         if: ${{ env.USERNAME != '' && env.PASSWORD != '' }}
@@ -81,11 +78,12 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=semver,pattern={{version}},value=${{ steps.tag_pattern.outputs.tag }},suffix=-${{ steps.tag_pattern.outputs.build }}
-            type=semver,pattern={{version}},value=${{ steps.tag_pattern.outputs.tag }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ steps.tag_pattern.outputs.tag }}
-            type=semver,pattern={{major}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }},value=${{ steps.tag_pattern.outputs.tag }}
-            type=semver,pattern={{major}}-latest,value=${{ steps.tag_pattern.outputs.tag }}
+            type=semver,pattern={{version}},value=${{ steps.semver.outputs.version }},suffix=-b${{ steps.semver.outputs.datecode }}.${{ steps.semver.outputs.build }}
+            type=semver,pattern={{version}},value=${{ steps.semver.outputs.version }},suffix=-b${{ steps.semver.outputs.datecode }}
+            type=semver,pattern={{version}},value=${{ steps.semver.outputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ steps.semver.outputs.version }}
+            type=semver,pattern={{major}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }},value=${{ steps.semver.outputs.version }}
+            type=semver,pattern={{major}}-latest,value=${{ steps.semver.outputs.version }}
 
       - name: Debug Container Meta outputs
         run:   echo "$OUTPUTS"
@@ -101,8 +99,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           containerfiles: ./v${{ steps.semver.outputs.major }}.Containerfile
           build-args: |
-            VERSION=${{ steps.tag_pattern.outputs.tag }}
-            BUILD=${{ steps.tag_pattern.outputs.build }}
+            VERSION=${{ steps.semver.outputs.version }}
+            BUILD=b${{ steps.semver.outputs.datecode }}.${{ steps.semver.outputs.build }}
             REPO_VERSION=23.04
 
       - name: Delete tag [${{ github.ref_name }}] on failure
