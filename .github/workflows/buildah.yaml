@@ -99,7 +99,7 @@ jobs:
           image: ghcr.io/${{ github.repository }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          containerfiles: ./${{ steps.semver.outputs.major }}.Containerfile
+          containerfiles: ./v${{ steps.semver.outputs.major }}.Containerfile
           build-args: |
             VERSION=${{ steps.tag_pattern.outputs.tag }}
             BUILD=${{ steps.tag_pattern.outputs.build }}
