@@ -8,6 +8,31 @@ ENV BUILD=$BUILD
 ARG REPO_VERSION="23.04"
 ENV REPO_VERSION=$REPO_VERSION
 
+# Create desktop icons
+# Create the QLC+ Fixture Editor desktop entry
+RUN echo "[Desktop Entry]\n\
+Version=1.0\n\
+Type=Application\n\
+Name=QLC+ Fixture Editor\n\
+Comment=\n\
+Exec=qlcplus-fixtureeditor --open %f\n\
+Icon=qlcplus-fixtureeditor\n\
+Path=\n\
+Terminal=false\n\
+StartupNotify=false" > /usr/share/applications/QLC+\ Fixture\ Editor.desktop
+
+# Create the Q Light Controller Plus desktop entry
+RUN echo "[Desktop Entry]\n\
+Version=1.0\n\
+Type=Application\n\
+Name=Q Light Controller Plus\n\
+Comment=\n\
+Exec=qlcplus --debug --fullscreen --log --web --open %f\n\
+Icon=qlcplus\n\
+Path=\n\
+Terminal=false\n\
+StartupNotify=false" > /usr/share/applications/Q\ Light\ Controller\ Plus.desktop
+
 # Only set as arg so that it is only set during the build process
 ARG DEBIAN_FRONTEND=noninteractive
 
