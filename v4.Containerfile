@@ -1,4 +1,4 @@
-FROM codercom/enterprise-desktop:latest
+FROM codercom/enterprise-desktop:ubuntu
 ARG VERSION="4.13.1"
 ENV VERSION=$VERSION
 
