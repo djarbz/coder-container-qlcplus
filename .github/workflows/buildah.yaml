@@ -7,6 +7,11 @@ on:
       # v#.#.#-b+YYMMDD.{BUILD_INDEX}
       - v*.*.*-b+*.*
 
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  IMAGE_NAME: ${{ github.repository_owner }}/qlcplus
+
 jobs:
   build_and_push:
     name: Build container and push to GHCR and Docker registries.
@@ -60,10 +65,6 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           flavor: latest=false
-          # images: |
-          #   ${{ github.repository_owner }}/qlcplus
-          #   ghcr.io/${{ github.repository_owner }}/qlcplus
-          #   docker.io/${{ github.repository_owner }}/qlcplus
           tags: |
             type=semver,pattern={{version}},value=${{ steps.semver.outputs.version }},suffix=-b${{ steps.semver.outputs.datecode }}.${{ steps.semver.outputs.build }}
             type=semver,pattern={{version}},value=${{ steps.semver.outputs.version }},suffix=-b${{ steps.semver.outputs.datecode }}
@@ -73,10 +74,12 @@ jobs:
             type=semver,pattern={{major}}-latest,value=${{ steps.semver.outputs.version }}
 
       - name: Debug Container Meta outputs
-        run:   echo "$OUTPUTS"
-        shell: bash
-        env:
-          OUTPUTS: ${{ toJSON(steps.meta.outputs) }}
+        # run: echo "${{ toJSON(steps.meta.outputs) }}"
+        run: |
+          echo "${{ steps.meta.outputs.version }}"
+          echo "${{ steps.meta.outputs.tags }}"
+          echo "${{ steps.meta.outputs.labels }}"
+          echo "${{ steps.meta.outputs.annotations }}"
 
       - name: Buildah Action
         id: buildah
@@ -104,32 +107,30 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Print Github image url
-        run: echo "Image pushed to ${{ steps.push-to-ghcr.outputs.registry-paths }}"
+        if: ${{ steps.push-to-ghcr.outcome != 'skipped' && steps.push-to-ghcr.outcome != 'failure' }}
+        run: |
+          echo "Image pushed to:"
+          echo "${{ steps.push-to-ghcr.outputs.registry-paths }}" | sed 's/[\[\]]//g' | tr ',' '\n'
       
       # Podman Login action (https://github.com/redhat-actions/podman-login) also be used to log in,
       # in which case 'username' and 'password' can be omitted.
       - name: Push To docker hub
-        if: ${{ env.USERNAME != '' && env.PASSWORD != '' }}
+        if: ${{ env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != '' }}
         id: push-to-hub
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ steps.buildah.outputs.image }}
           tags: ${{ steps.buildah.outputs.tags }}
           registry: docker.io
-          username: ${{ env.USERNAME }}
-          password: ${{ env.PASSWORD }}
-        env:
-          USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          PASSWORD: ${{ secrets.DOCKER_PASSWORD }} 
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
 
       - name: Print Docker Hub image url
-        if: ${{ env.USERNAME != '' && env.PASSWORD != '' }}
-        run: echo "Image pushed to ${{ steps.push-to-hub.outputs.registry-paths }}"
-        env:
-          USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          PASSWORD: ${{ secrets.DOCKER_PASSWORD }} 
+        if: ${{ steps.push-to-hub.outcome != 'skipped' && steps.push-to-hub.outcome != 'failure' }}
+        run: |
+          echo "Image pushed to:"
+          echo "${{ steps.push-to-hub.outputs.registry-paths }}" | sed 's/[\[\]]//g' | tr ',' '\n'
             
-
       - name: Delete tag [${{ github.ref_name }}] on failure
         if: failure()
         run: |
