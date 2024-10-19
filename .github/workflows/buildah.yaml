@@ -73,14 +73,6 @@ jobs:
             type=semver,pattern={{major}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }},value=${{ steps.semver.outputs.version }}
             type=semver,pattern={{major}}-latest,value=${{ steps.semver.outputs.version }}
 
-      - name: Debug Container Meta outputs
-        # run: echo "${{ toJSON(steps.meta.outputs) }}"
-        run: |
-          echo "${{ steps.meta.outputs.version }}"
-          echo "${{ steps.meta.outputs.tags }}"
-          echo "${{ steps.meta.outputs.labels }}"
-          echo "${{ steps.meta.outputs.annotations }}"
-
       - name: Buildah Action
         id: buildah
         uses: redhat-actions/buildah-build@v2
