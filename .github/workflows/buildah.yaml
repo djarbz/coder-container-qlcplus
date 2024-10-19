@@ -82,7 +82,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           containerfiles: ./v${{ steps.semver.outputs.major }}.Containerfile
           build-args: |
-            VERSION=${{ steps.semver.outputs.version }}
+            QLC_VERSION=${{ steps.semver.outputs.version }}
             BUILD=b${{ steps.semver.outputs.datecode }}.${{ steps.semver.outputs.build }}
             REPO_VERSION=23.04
       
